@@ -14,14 +14,37 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.vigvf.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true  });
+
+
+
+
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.vigvf.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+
+const client = new MongoClient(uri, { useNewUrlParser: true,useUnifiedTopology: true });
 client.connect(err => {
-  
+  const productcollection = client.db("red-onion").collection("products");
+
+app.get("/getproductbycategory",(req,res) => {
+  const category  =req.query.category
+  productcollection.find({}).limit(6)
+  .toArray((err,documents) => {
+    res.send(documents)
+  })
+})
 
 
-  console.log("db connected");
+app.get("/getproductbyid",(req,res) => {
+  productcollection.find({id: req.query.id})
+  .toArray((err,documents) => {
+    res.send(documents[0])
+  })
+})
+
+console.log("db connected");
+
 });
+
+  
 
 
 app.listen(port, () => {
